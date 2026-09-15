@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Secret Arcade Web Viewer</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #10131a;
+      font-family: Arial, Helvetica, sans-serif;
+      color: white;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .header {
+      background: #171c26;
+      border: 2px solid #303949;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+    }
+
+    .logo {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 3px;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: #aeb8c9;
+      font-size: 14px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    #urlBox {
+      flex: 1;
+      min-width: 0;
+      padding: 15px;
+      border-radius: 10px;
+      border: 2px solid #394457;
+      background: #0c0f15;
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+
+    #urlBox:focus {
+      border-color: #6d7cff;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 0 22px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+      background: #5865f2;
+    }
+
+    button:hover {
+      background: #4752c4;
+    }
+
+    #clearButton {
+      background: #303746;
+    }
+
+    #clearButton:hover {
+      background: #424b5d;
+    }
+
+    .status {
+      margin-top: 12px;
+      color: #aeb8c9;
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    .viewer {
+      margin-top: 15px;
+      background: #080a0e;
+      border: 2px solid #303949;
+      border-radius: 15px;
+      overflow: hidden;
+      min-height: 650px;
+    }
+
+    .viewer iframe {
+      display: block;
+      width: 100%;
+      height: 650px;
+      border: none;
+      background: white;
+    }
+
+    .welcome {
+      height: 650px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #7f899a;
+      padding: 30px;
+    }
+
+    .welcome h2 {
+      color: white;
+    }
+
+    @media (max-width: 650px) {
+      .controls {
+        flex-direction: column;
+      }
+
+      button {
+        height: 48px;
+      }
+
+      .viewer,
+      .viewer iframe,
+      .welcome {
+        min-height: 500px;
+        height: 500px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="header">
+
+      <div class="logo">
+        🎮 SECRET ARCADE
+      </div>
+
+      <div class="subtitle">
+        Web Viewer
+      </div>
+
+      <div class="controls">
+
+        <input
+          id="urlBox"
+          type="text"
+          placeholder="Enter a website URL..."
+          autocomplete="off"
+        >
+
+        <button onclick="loadWebsite()">
+          GO
+        </button>
+
+        <button id="clearButton" onclick="clearViewer()">
+          CLEAR
+        </button>
+
+      </div>
+
+      <div class="status" id="status">
+        Enter a website address above.
+      </div>
+
+    </div>
+
+    <div class="viewer" id="viewer">
+
+      <div class="welcome">
+        <div>
+          <h2>🕹️ Ready to Browse</h2>
+          <p>Enter a URL and press GO.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    function loadWebsite() {
+
+      let input = document.getElementById("urlBox");
+      let url = input.value.trim();
+      let status = document.getElementById("status");
+      let viewer = document.getElementById("viewer");
+
+      if (url === "") {
+        status.textContent = "Please enter a website address.";
+        return;
+      }
+
+      // Add HTTPS if the user didn't type a protocol.
+      if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        url = "https://" + url;
+      }
+
+      try {
+        new URL(url);
+      } catch {
+        status.textContent = "That doesn't look like a valid URL.";
+        return;
+      }
+
+      status.textContent = "Loading " + url + "...";
+
+      viewer.innerHTML = `
+        <iframe
+          src="${url}"
+          title="Secret Arcade Web Viewer"
+          allowfullscreen>
+        </iframe>
+      `;
+
+      document.querySelector(".viewer iframe").addEventListener("load", function() {
+        status.textContent = "Loaded: " + url;
+      });
+
+    }
+
+    function clearViewer() {
+
+      document.getElementById("urlBox").value = "";
+
+      document.getElementById("status").textContent =
+        "Enter a website address above.";
+
+      document.getElementById("viewer").innerHTML = `
+        <div class="welcome">
+          <div>
+            <h2>🕹️ Ready to Browse</h2>
+            <p>Enter a URL and press GO.</p>
+          </div>
+        </div>
+      `;
+
+    }
+
+    // Press Enter to load the website.
+    document.getElementById("urlBox").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        loadWebsite();
+      }
+    });
+
+  </script>
+
+</body>
+</html>
